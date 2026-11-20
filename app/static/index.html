@@ -568,7 +568,12 @@
     function getUserId() {
       let id = localStorage.getItem(SESSION_KEY);
       if (!id) {
-        id = crypto.randomUUID();
+        // crypto.randomUUID 只在安全上下文(HTTPS 或 localhost)可用。
+        // 用 http + IP / 普通域名访问时它是 undefined,直接调用会抛 TypeError,
+        // 而这一步在 fetch 之前,表现为「回复失败，请稍后重试」且后端收不到任何请求。
+        id = (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+          ? crypto.randomUUID()
+          : "u-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
         localStorage.setItem(SESSION_KEY, id);
       }
       return id;

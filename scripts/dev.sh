@@ -43,4 +43,7 @@ echo "Milvus OK"
 
 make mcp-up   # tools: 物流/售后 MCP Server(独立进程 :8101/:8102)
 
-uv run uvicorn app.main:app --port 8000
+# --host 0.0.0.0:让 Windows 侧的浏览器能打开 http://localhost:8000。
+# WSL2 默认 NAT,绑 127.0.0.1 的端口不会转发到宿主机;绑 0.0.0.0 只暴露在 WSL 虚拟网络,
+# 没做 portproxy 的话物理局域网里的其他机器访问不到。
+uv run uvicorn app.main:app --port 8000 --host 0.0.0.0
